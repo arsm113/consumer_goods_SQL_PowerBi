@@ -17,7 +17,8 @@ from fact_sales_monthly where fiscal_year=2020),
 unique_2021 as (select count(distinct product_code) as unique_product_2021 
 from fact_sales_monthly where fiscal_year=2021)
 select unique_2020.*, unique_2021.*,
-round(((unique_2021.unique_product_2021 - unique_2020.unique_product_2020)/unique_2020.unique_product_2020)*100,2) as percentage_chg
+round(((unique_2021.unique_product_2021 - unique_2020.unique_product_2020)
+   /unique_2020.unique_product_2020)*100,2) as percentage_chg
    from unique_2020, unique_2021;
    
 -- 3. Provide a report with all the unique product counts for each segment and

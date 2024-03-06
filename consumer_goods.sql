@@ -61,11 +61,14 @@ where product_2020.segment=product_2021.segment;
 -- product
 -- manufacturing_cost
 
-select mc.product_code,p.product, mc.manufacturing_cost from
- fact_manufacturing_cost mc join dim_product p on mc.product_code=p.product_code
- where mc.manufacturing_cost in (select max(manufacturing_cost) from fact_manufacturing_cost
+select mc.product_code,p.product, mc.manufacturing_cost 
+from fact_manufacturing_cost mc join 
+dim_product p on mc.product_code=p.product_code
+where mc.manufacturing_cost 
+in (select max(manufacturing_cost) from fact_manufacturing_cost
 union 
-select min(manufacturing_cost) from fact_manufacturing_cost) order by manufacturing_cost desc ;
+select min(manufacturing_cost) from fact_manufacturing_cost)
+order by manufacturing_cost desc ;
 
 
 -- 6. Generate a report which contains the top 5 customers who received an
@@ -122,16 +125,21 @@ order by qty desc;
 
 with gross_ml as (
 select c.channel, round(sum(gp.gross_price*sm.sold_quantity)/1000000, 2) as gross_sales_ml
-from fact_gross_price gp join fact_sales_monthly sm on gp.product_code=sm.product_code
-join dim_customer c on sm.customer_code=c.customer_code where sm.fiscal_year=2021 group by c.channel),
+from fact_gross_price gp join fact_sales_monthly sm 
+on gp.product_code=sm.product_code
+join dim_customer c on sm.customer_code=c.customer_code 
+where sm.fiscal_year=2021 group by c.channel),
 
-total_sales as (select round(sum(gp.gross_price*sm.sold_quantity)/1000000, 2) as gross_sales_total
-from fact_gross_price gp join fact_sales_monthly sm on gp.product_code=sm.product_code
- where sm.fiscal_year=2021)
+total_sales as 
+(select round(sum(gp.gross_price*sm.sold_quantity)/1000000, 2) as gross_sales_total
+from fact_gross_price gp join fact_sales_monthly sm
+on gp.product_code=sm.product_code
+where sm.fiscal_year=2021)
  
  select gross_ml.channel, concat(gross_ml.gross_sales_ml,' M') as gross_sales_ml, 
- concat(round((gross_ml.gross_sales_ml/total_sales.gross_sales_total)*100, 2), ' %') as percent
- from gross_ml,total_sales order by percent desc;
+ concat(round((gross_ml.gross_sales_ml/
+total_sales.gross_sales_total)*100, 2), ' %') as percent
+from gross_ml,total_sales order by percent desc;
  
  
  
